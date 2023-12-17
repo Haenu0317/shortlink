@@ -1,5 +1,7 @@
 package com.haenu.shortlink.dto.resp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.haenu.shortlink.common.serialize.PhoneDesensitizationSerializer;
 import lombok.Data;
 
 /**
@@ -26,6 +28,7 @@ public class UserRespDto {
     /**
      * 手机号
      */
+    @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
 
     /**
