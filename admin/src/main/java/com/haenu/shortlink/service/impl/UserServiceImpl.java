@@ -13,8 +13,11 @@ import com.haenu.shortlink.dto.resp.UserRespDto;
 import com.haenu.shortlink.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
+import static com.haenu.shortlink.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
 import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.USER_NAME_EXIST;
 import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.USER_SAVE_ERROR;
 
@@ -29,6 +32,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
         implements UserService {
 
     private final RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
+
+    private final RedissonClient redissonClient;
 
     /**
      * 根据用户名返回结果
@@ -67,15 +72,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
      */
     @Override
     public void userRegister(UserRegisterDTO requestParm) {
-        if (!hasUserName(requestParm.getUsername())){
+        if (!hasUserName(requestParm.getUsername())) {
             throw new ClientException(USER_NAME_EXIST);
         }
-
-        int insert = baseMapper.insert(BeanUtil.toBean(requestParm,UserDO.class));
-        if (insert < 1){
-            throw new ClientException(USER_SAVE_ERROR);
+        RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + requestParm.getUsername());
+        try {
+            if (lock.tryLock()) {
+                int insert = baseMapper.insert(BeanUtil.toBean(requestParm, UserDO.class));
+                if (insert < 1) {
+                    throw new ClientException(USER_SAVE_ERROR);
+                }
+                userRegisterCachePenetrationBloomFilter.add(requestParm.getUsername());
+                return;
+            }
+            throw new ClientException(USER_NAME_EXIST);
+        } finally {
+            lock.unlock();
         }
-        userRegisterCachePenetrationBloomFilter.add(requestParm.getUsername());
 
     }
 }
