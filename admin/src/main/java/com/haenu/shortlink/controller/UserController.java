@@ -76,4 +76,17 @@ public class UserController {
 
     }
 
+    /**
+     * 用户退出
+     *
+     * @param username
+     * @param token
+     * @return
+     */
+    @DeleteMapping("/logout")
+    public Result<Void> logout(@RequestParam("username") String username, @RequestParam("token") String token) {
+        userService.logout(username, token);
+        return Results.success();
+    }
+
 }
