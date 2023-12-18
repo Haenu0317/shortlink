@@ -2,6 +2,7 @@ package com.haenu.shortlink.service;
 
 import com.haenu.shortlink.dao.entity.UserDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.haenu.shortlink.dto.req.UserRegisterDTO;
 import com.haenu.shortlink.dto.resp.UserRespDto;
 
 /**
@@ -17,5 +18,18 @@ public interface UserService extends IService<UserDO> {
      * @return 用户返回信息
      */
     UserRespDto getUserByUsername(String username);
+
+    /**
+     * 检查用户名是否存在可用
+     * @param username
+     * @return
+     */
+    Boolean hasUserName(String username);
+
+    /**
+     * 新增用户
+     * @param requestParm
+     */
+    void userRegister(UserRegisterDTO requestParm);
 
 }
