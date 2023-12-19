@@ -31,7 +31,6 @@ public class GroupDO extends BaseDO implements Serializable {
     /**
      * 分组名称
      */
-    @TableLogic
     @TableField(value = "name")
     private String name;
 

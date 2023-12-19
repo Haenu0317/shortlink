@@ -3,12 +3,12 @@ package com.haenu.shortlink.controller;
 import com.haenu.shortlink.common.convention.result.Result;
 import com.haenu.shortlink.common.convention.result.Results;
 import com.haenu.shortlink.dto.req.GroupSaveReqDTO;
+import com.haenu.shortlink.dto.resp.GroupRespDTO;
 import com.haenu.shortlink.service.GroupService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 短链接分组Controller
@@ -29,6 +29,11 @@ public class GroupContoller {
     public Result<Void> save(@RequestBody GroupSaveReqDTO requestParm) {
         groupService.saveGroup(requestParm.getName());
         return Results.success();
+    }
+
+    @GetMapping
+    public Result<List<GroupRespDTO>> getAll() {
+        return Results.success(groupService.listGroup());
     }
 
 
