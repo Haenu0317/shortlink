@@ -10,4 +10,9 @@ import com.haenu.shortlink.dao.entity.GroupDO;
  */
 public interface GroupService extends IService<GroupDO> {
 
+    /**
+     * 新增分组
+     * @param groupName 分组名
+     */
+    void saveGroup(String groupName);
 }
