@@ -1,18 +1,21 @@
 package com.haenu.shortlink.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.haenu.shortlink.common.database.BaseDO;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 短链接分组实体
+ *
  * @TableName t_group
  */
-@TableName(value = "t_group")
 @Data
-public class GroupDO implements Serializable {
+@Builder
+@TableName(value = "t_group")
+public class GroupDO extends BaseDO implements Serializable {
     /**
      * ID
      */
@@ -44,23 +47,6 @@ public class GroupDO implements Serializable {
     @TableField(value = "sort_order")
     private Integer sortOrder;
 
-    /**
-     * 创建时间
-     */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
-    private Date createTime;
-
-    /**
-     * 修改时间
-     */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
-
-    /**
-     * 删除标识 0：未删除 1：已删除
-     */
-    @TableField(value = "del_flag")
-    private Integer delFlag;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
