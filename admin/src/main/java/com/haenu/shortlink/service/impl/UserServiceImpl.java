@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haenu.shortlink.common.biz.user.UserContext;
 import com.haenu.shortlink.common.convention.exception.ClientException;
 import com.haenu.shortlink.common.enums.UserErrorCodeEnum;
 import com.haenu.shortlink.dao.entity.UserDO;
@@ -109,9 +110,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     @Override
     public void updateByUserName(UserUpdateDTO userUpdateDTO) {
         //todo 检查当前修改的用户信息是否是我们的登录用户
-        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
-                .eq(UserDO::getUsername, userUpdateDTO.getUsername());
-        update(BeanUtil.toBean(userUpdateDTO, UserDO.class), queryWrapper);
+        if (userUpdateDTO.getUsername() == UserContext.getUsername()){
+            LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
+                    .eq(UserDO::getUsername, userUpdateDTO.getUsername());
+            update(BeanUtil.toBean(userUpdateDTO, UserDO.class), queryWrapper);
+        }else {
+            throw new ClientException("用户不一致");
+        }
     }
 
     /**
