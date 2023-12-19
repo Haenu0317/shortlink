@@ -56,7 +56,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
     @Override
     public List<GroupRespDTO> listGroup() {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
-                .isNull(GroupDO::getUsername)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getCreateTime);
         List<GroupDO> groupDOS = list(queryWrapper);

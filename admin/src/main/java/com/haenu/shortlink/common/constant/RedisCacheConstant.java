@@ -9,4 +9,5 @@ package com.haenu.shortlink.common.constant;
  */
 public class RedisCacheConstant {
     public static final String LOCK_USER_REGISTER_KEY = "short-link:lock_user-register:";
+    public static final String TOKEN_PREFIX = "login_";
 }

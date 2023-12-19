@@ -17,6 +17,7 @@ import com.haenu.shortlink.dto.req.UserUpdateDTO;
 import com.haenu.shortlink.dto.resp.UserLoginRespDTO;
 import com.haenu.shortlink.dto.resp.UserRespDto;
 import com.haenu.shortlink.service.UserService;
+import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
@@ -24,9 +25,11 @@ import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.haenu.shortlink.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
+import static com.haenu.shortlink.common.constant.RedisCacheConstant.TOKEN_PREFIX;
 import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.*;
 
 /**
@@ -34,6 +37,7 @@ import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.*;
  * @description 针对表【t_user】的数据库操作Service实现
  * @createDate 2023-12-17 10:32:14
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
@@ -110,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     @Override
     public void updateByUserName(UserUpdateDTO userUpdateDTO) {
         //todo 检查当前修改的用户信息是否是我们的登录用户
-        if (userUpdateDTO.getUsername() == UserContext.getUsername()){
+        if (Objects.equals(userUpdateDTO.getUsername(), UserContext.getUsername())){
             LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
                     .eq(UserDO::getUsername, userUpdateDTO.getUsername());
             update(BeanUtil.toBean(userUpdateDTO, UserDO.class), queryWrapper);
@@ -137,13 +141,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
             throw new ClientException(USER_NULL);
         }
 
-        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey("login_" + userLoginReqDTO.getUsername()))) {
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(TOKEN_PREFIX + userLoginReqDTO.getUsername()))) {
             throw new ClientException("用户已经登录");
         }
 
         String uuid = UUID.randomUUID().toString();
-        stringRedisTemplate.opsForHash().put("login_" + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(user));
-        stringRedisTemplate.expire("login_" + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForHash().put(TOKEN_PREFIX + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(user));
+        stringRedisTemplate.expire(TOKEN_PREFIX + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
         return new UserLoginRespDTO(uuid);
     }
 
@@ -155,7 +159,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
      */
     @Override
     public Boolean checkLogin(String username, String token) {
-        return stringRedisTemplate.opsForHash().get("login_" + username, token) != null;
+        return stringRedisTemplate.opsForHash().get(TOKEN_PREFIX + username, token) != null;
     }
 
     /**
@@ -168,7 +172,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     @Override
     public void logout(String username, String token) {
         if (checkLogin(username, token)) {
-            stringRedisTemplate.delete("login_" + username);
+            stringRedisTemplate.delete(TOKEN_PREFIX + username);
             return;
         }
         throw new ClientException("Token不存在或用户未登录");
