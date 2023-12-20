@@ -113,7 +113,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
      */
     @Override
     public void updateByUserName(UserUpdateDTO userUpdateDTO) {
-        //todo 检查当前修改的用户信息是否是我们的登录用户
         if (Objects.equals(userUpdateDTO.getUsername(), UserContext.getUsername())){
             LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
                     .eq(UserDO::getUsername, userUpdateDTO.getUsername());
@@ -147,7 +146,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
 
         String uuid = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put(TOKEN_PREFIX + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(user));
-        stringRedisTemplate.expire(TOKEN_PREFIX + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
+        //todo token过期时间
+        stringRedisTemplate.expire(TOKEN_PREFIX + userLoginReqDTO.getUsername(), 30L, TimeUnit.DAYS);
         return new UserLoginRespDTO(uuid);
     }
 

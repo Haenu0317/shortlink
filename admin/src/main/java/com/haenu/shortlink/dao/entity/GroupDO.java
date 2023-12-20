@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.haenu.shortlink.common.database.BaseDO;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -13,6 +14,7 @@ import java.io.Serializable;
  * @TableName t_group
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @TableName(value = "t_group")
 public class GroupDO extends BaseDO implements Serializable {

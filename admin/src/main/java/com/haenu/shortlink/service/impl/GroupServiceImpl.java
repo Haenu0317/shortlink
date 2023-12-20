@@ -2,11 +2,14 @@ package com.haenu.shortlink.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haenu.shortlink.common.biz.user.UserContext;
 import com.haenu.shortlink.dao.entity.GroupDO;
 import com.haenu.shortlink.dao.mapper.GroupMapper;
+import com.haenu.shortlink.dto.req.GroupSortReqDTO;
+import com.haenu.shortlink.dto.req.GroupUpdateReqDTO;
 import com.haenu.shortlink.dto.resp.GroupRespDTO;
 import com.haenu.shortlink.service.GroupService;
 import com.haenu.shortlink.toolkit.RandomStringGenerator;
@@ -60,6 +63,54 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getCreateTime);
         List<GroupDO> groupDOS = list(queryWrapper);
         return BeanUtil.copyToList(groupDOS, GroupRespDTO.class);
+    }
+
+    /**
+     * 修改分组信息
+     *
+     * @param requestParm
+     */
+    @Override
+    public void updateGroup(GroupUpdateReqDTO requestParm) {
+        LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                .eq(GroupDO::getGid, requestParm.getGid())
+                .eq(GroupDO::getUsername, UserContext.getUsername());
+        GroupDO groupDO = GroupDO.builder().build();
+        BeanUtil.copyProperties(requestParm, groupDO);
+        update(groupDO, updateWrapper);
+
+    }
+
+    /**
+     * 删除分组信息
+     *
+     * @param requestParm
+     */
+    @Override
+    public void deleteGroup(String requestParm) {
+        LambdaQueryWrapper<GroupDO> deleteQueryWrapper = Wrappers.lambdaQuery(GroupDO.class)
+                .eq(GroupDO::getGid, requestParm)
+                .eq(GroupDO::getUsername, UserContext.getUsername());
+
+        remove(deleteQueryWrapper);
+    }
+
+    /**
+     * 短链接分组排序
+     *
+     * @param requestParm
+     */
+    @Override
+    public void sortGroup(List<GroupSortReqDTO> requestParm) {
+        requestParm.forEach(each -> {
+            GroupDO groupDO = GroupDO.builder()
+                    .sortOrder(each.getSortOrder())
+                    .build();
+            LambdaUpdateWrapper<GroupDO> lambdaUpdateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                    .eq(GroupDO::getUsername, UserContext.getUsername())
+                    .eq(GroupDO::getGid, each.getGid());
+            update(groupDO,lambdaUpdateWrapper);
+        });
     }
 
     /**
