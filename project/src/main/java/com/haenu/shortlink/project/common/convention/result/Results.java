@@ -1,8 +1,8 @@
 package com.haenu.shortlink.project.common.convention.result;
 
 
-import com.haenu.shortlink.common.convention.errorcode.BaseErrorCode;
-import com.haenu.shortlink.common.convention.exception.AbstractException;
+import com.haenu.shortlink.project.common.convention.errorcode.BaseErrorCode;
+import com.haenu.shortlink.project.common.convention.exception.AbstractException;
 
 import java.util.Optional;
 
