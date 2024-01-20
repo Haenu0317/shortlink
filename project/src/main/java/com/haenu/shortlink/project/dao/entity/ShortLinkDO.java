@@ -12,6 +12,7 @@ import java.util.Date;
 
 /**
  * 短链接实体
+ *
  * @TableName t_link
  */
 @TableName(value = "t_link")
@@ -89,6 +90,11 @@ public class ShortLinkDO extends BaseDO implements Serializable {
     @TableField("`describe`")
     private String describe;
 
+    /**
+     * 网站标识
+     */
+    @TableField(value = "favicon")
+    private String favicon;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
