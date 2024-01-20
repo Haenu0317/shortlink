@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @TableName(value = "t_link")
 @Data
-public class LinkDO extends BaseDO implements Serializable {
+public class ShortLinkDO extends BaseDO implements Serializable {
     /**
      * ID
      */
@@ -86,7 +86,7 @@ public class LinkDO extends BaseDO implements Serializable {
     /**
      * 描述
      */
-    @TableField(value = "describe")
+    @TableField("`describe`")
     private String describe;
 
 

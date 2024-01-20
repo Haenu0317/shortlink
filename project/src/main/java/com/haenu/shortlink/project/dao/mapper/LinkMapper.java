@@ -1,6 +1,6 @@
 package com.haenu.shortlink.project.dao.mapper;
 
-import com.haenu.shortlink.project.dao.entity.LinkDO;
+import com.haenu.shortlink.project.dao.entity.ShortLinkDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2023-12-20 10:57:56
 * @Entity generator.domain.TLink
 */
-public interface LinkMapper extends BaseMapper<LinkDO> {
+public interface LinkMapper extends BaseMapper<ShortLinkDO> {
 
 }
 
