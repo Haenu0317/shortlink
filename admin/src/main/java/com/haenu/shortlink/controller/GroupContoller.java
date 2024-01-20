@@ -69,7 +69,11 @@ public class GroupContoller {
         return Results.success();
     }
 
-
+    /**
+     * 排序
+     * @param requestParm
+     * @return
+     */
     @PostMapping("/sort")
     public Result<Void> sortGroup(@RequestBody List<GroupSortReqDTO> requestParm) {
         groupService.sortGroup(requestParm);
