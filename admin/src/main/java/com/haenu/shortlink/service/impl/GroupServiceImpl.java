@@ -46,10 +46,20 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
      */
     @Override
     public void saveGroup(String groupName) {
+        this.saveGroup(UserContext.getUsername(), groupName);
+    }
+
+    /**
+     * 新增分组
+     *
+     * @param groupName 分组名
+     */
+    @Override
+    public void saveGroup(String username, String groupName) {
         String gid;
         while (true) {
             gid = RandomStringGenerator.generateRandomString();
-            if (!hasGid(gid)) {
+            if (!hasGid(username, gid)) {
                 break;
             }
         }
@@ -57,7 +67,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
                 .gid(RandomStringGenerator.generateRandomString())
                 .sortOrder(0)
                 .name(groupName)
-                .username(UserContext.getUsername())
+                .username(username)
                 .build();
         save(groupDO);
     }
@@ -130,7 +140,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
             LambdaUpdateWrapper<GroupDO> lambdaUpdateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
                     .eq(GroupDO::getUsername, UserContext.getUsername())
                     .eq(GroupDO::getGid, each.getGid());
-            update(groupDO,lambdaUpdateWrapper);
+            update(groupDO, lambdaUpdateWrapper);
         });
     }
 
@@ -141,10 +151,10 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
      * @return
      */
 
-    private boolean hasGid(String gid) {
+    private boolean hasGid(String username, String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
-                .eq(GroupDO::getUsername, UserContext.getUsername());
+                .eq(GroupDO::getUsername, Optional.ofNullable(username).orElse(UserContext.getUsername()));
         GroupDO groupDO = baseMapper.selectOne(queryWrapper);
         return groupDO != null;
     }

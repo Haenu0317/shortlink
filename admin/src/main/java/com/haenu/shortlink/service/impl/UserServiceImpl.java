@@ -100,7 +100,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
                     throw new ClientException(USER_SAVE_ERROR);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParm.getUsername());
-                groupService.saveGroup("默认分组");
+                groupService.saveGroup(requestParm.getUsername(), "默认分组");
                 return;
             }
             throw new ClientException(USER_NAME_EXIST);
@@ -116,11 +116,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
      */
     @Override
     public void updateByUserName(UserUpdateDTO userUpdateDTO) {
-        if (Objects.equals(userUpdateDTO.getUsername(), UserContext.getUsername())){
+        if (Objects.equals(userUpdateDTO.getUsername(), UserContext.getUsername())) {
             LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
                     .eq(UserDO::getUsername, userUpdateDTO.getUsername());
             update(BeanUtil.toBean(userUpdateDTO, UserDO.class), queryWrapper);
-        }else {
+        } else {
             throw new ClientException("用户不一致");
         }
     }
