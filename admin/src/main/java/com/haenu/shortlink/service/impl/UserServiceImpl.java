@@ -16,6 +16,7 @@ import com.haenu.shortlink.dto.req.UserRegisterDTO;
 import com.haenu.shortlink.dto.req.UserUpdateDTO;
 import com.haenu.shortlink.dto.resp.UserLoginRespDTO;
 import com.haenu.shortlink.dto.resp.UserRespDto;
+import com.haenu.shortlink.service.GroupService;
 import com.haenu.shortlink.service.UserService;
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     private final RedissonClient redissonClient;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final GroupService groupService;
 
     /**
      * 根据用户名返回结果
@@ -97,13 +100,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
                     throw new ClientException(USER_SAVE_ERROR);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParm.getUsername());
+                groupService.saveGroup("默认分组");
                 return;
             }
             throw new ClientException(USER_NAME_EXIST);
         } finally {
             lock.unlock();
         }
-
     }
 
     /**
