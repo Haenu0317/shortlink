@@ -5,7 +5,7 @@ import com.haenu.shortlink.common.convention.result.Results;
 import com.haenu.shortlink.dto.req.GroupSaveReqDTO;
 import com.haenu.shortlink.dto.req.GroupSortReqDTO;
 import com.haenu.shortlink.dto.req.GroupUpdateReqDTO;
-import com.haenu.shortlink.dto.resp.GroupRespDTO;
+import com.haenu.shortlink.dto.resp.ShortLinkGroupRespDTO;
 import com.haenu.shortlink.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +43,7 @@ public class GroupContoller {
      * @return
      */
     @GetMapping
-    public Result<List<GroupRespDTO>> getAll() {
+    public Result<List<ShortLinkGroupRespDTO>> getAll() {
         return Results.success(groupService.listGroup());
     }
 

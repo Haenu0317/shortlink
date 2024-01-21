@@ -3,15 +3,18 @@ package com.haenu.shortlink.project.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haenu.shortlink.project.common.convention.exception.ServiceException;
 import com.haenu.shortlink.project.dao.entity.ShortLinkDO;
-import com.haenu.shortlink.project.dao.mapper.LinkMapper;
+import com.haenu.shortlink.project.dao.mapper.ShortLinkMapper;
 import com.haenu.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkPageReqDTO;
+import com.haenu.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.haenu.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.haenu.shortlink.project.service.ShortLinkService;
 import com.haenu.shortlink.project.toolkit.HashUtil;
@@ -21,6 +24,9 @@ import org.redisson.api.RBloomFilter;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Haenu0317
  * @description 针对表【t_link】的数据库操作Service实现
@@ -29,9 +35,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ShortLinkServiceImpl extends ServiceImpl<LinkMapper, ShortLinkDO>
+public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO>
         implements ShortLinkService {
 
+    private final ShortLinkMapper shortLinkMapper;
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
 
     /**
@@ -84,6 +91,33 @@ public class ShortLinkServiceImpl extends ServiceImpl<LinkMapper, ShortLinkDO>
         IPage<ShortLinkDO> resultPage = page(requestParam, queryWrapper);
 
         return resultPage.convert(each -> BeanUtil.copyProperties(each, ShortLinkPageRespDTO.class));
+    }
+
+    /**
+     * 修改短链接
+     *
+     * @param requestParam
+     */
+    @Override
+    public void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
+
+    }
+
+    /**
+     * 查询短链接分组内数量
+     *
+     * @param requestParam
+     * @return
+     */
+    @Override
+    public List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam) {
+        QueryWrapper<ShortLinkDO> queryWrapper = Wrappers.query(new ShortLinkDO())
+                .select("gid as gid, count(*) as shortLinkCount")
+                .in("gid", requestParam)
+                .eq("enable_status", 0)
+                .groupBy("gid");
+        List<Map<String, Object>> shortLinkDOList = baseMapper.selectMaps(queryWrapper);
+        return BeanUtil.copyToList(shortLinkDOList, ShortLinkGroupCountQueryRespDTO.class);
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {

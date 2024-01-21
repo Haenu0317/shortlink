@@ -33,4 +33,8 @@ public class GroupRespDTO {
     @TableField(value = "sort_order")
     private Integer sortOrder;
 
+    /**
+     * 当前分组下短链接数量
+     */
+    private Integer shortLinkCount;
 }

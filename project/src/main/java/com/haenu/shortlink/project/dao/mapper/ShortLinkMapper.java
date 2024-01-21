@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2023-12-20 10:57:56
 * @Entity generator.domain.TLink
 */
-public interface LinkMapper extends BaseMapper<ShortLinkDO> {
+public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
 
 }
 

@@ -5,11 +5,15 @@ import com.haenu.shortlink.project.common.convention.result.Result;
 import com.haenu.shortlink.project.common.convention.result.Results;
 import com.haenu.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkPageReqDTO;
+import com.haenu.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.haenu.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.haenu.shortlink.project.service.ShortLinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 短链接控制层
@@ -34,11 +38,28 @@ public class ShortLinkController {
     }
 
     /**
+     * 修改短链接
+     */
+    @PutMapping("/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+        shortLinkService.updateShortLink(requestParam);
+        return Results.success();
+    }
+
+    /**
      * 分页查询短链接
      */
     @GetMapping("/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return Results.success(shortLinkService.pageShortLink(requestParam));
+    }
+
+    /**
+     * 查询短链接分组内数量
+     */
+    @GetMapping("count")
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam) {
+        return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
     }
 
 

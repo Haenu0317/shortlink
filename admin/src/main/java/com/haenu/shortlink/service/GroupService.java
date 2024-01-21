@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.haenu.shortlink.dao.entity.GroupDO;
 import com.haenu.shortlink.dto.req.GroupSortReqDTO;
 import com.haenu.shortlink.dto.req.GroupUpdateReqDTO;
-import com.haenu.shortlink.dto.resp.GroupRespDTO;
+import com.haenu.shortlink.dto.resp.ShortLinkGroupRespDTO;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface GroupService extends IService<GroupDO> {
      * 查询所有分组
      * @return 所有分组
      */
-    List<GroupRespDTO> listGroup();
+    List<ShortLinkGroupRespDTO> listGroup();
 
     /**
      * 修改分组信息
