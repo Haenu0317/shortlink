@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2023/12/20 13:38
  */
 @RestController
-@RequestMapping("/api/short-link/admin/v1")
+@RequestMapping("/api/short-link/v1")
 @RequiredArgsConstructor
 public class ShortLinkController {
 
