@@ -25,11 +25,7 @@ public class GroupRespDTO {
     @TableField(value = "name")
     private String name;
 
-    /**
-     * 创建分组用户名
-     */
-    @TableField(value = "username")
-    private String username;
+
 
     /**
      * 分组排序
