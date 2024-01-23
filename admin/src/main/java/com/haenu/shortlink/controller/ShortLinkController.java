@@ -2,9 +2,11 @@ package com.haenu.shortlink.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haenu.shortlink.common.convention.result.Result;
+import com.haenu.shortlink.common.convention.result.Results;
 import com.haenu.shortlink.remote.dto.ShortLinkRemoteService;
 import com.haenu.shortlink.remote.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkPageReqDTO;
+import com.haenu.shortlink.remote.dto.req.ShortLinkUpdateReqDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkPageRespDTO;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +39,14 @@ public class ShortLinkController {
     @GetMapping("/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return shortLinkRemoteService.pageShortLink(requestParam);
+    }
+
+    /**
+     * 修改短链接
+     */
+    @PostMapping("/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+        shortLinkRemoteService.updateShortLink(requestParam);
+        return Results.success();
     }
 }
