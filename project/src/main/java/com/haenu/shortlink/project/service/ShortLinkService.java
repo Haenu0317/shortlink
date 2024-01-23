@@ -9,6 +9,8 @@ import com.haenu.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkPageRespDTO;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 import java.util.List;
 
@@ -45,4 +47,12 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @return
      */
     List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam);
+
+    /**
+     * 短链接跳转
+     * @param shortUri
+     * @param request
+     * @param response
+     */
+    void restoreUrl(String shortUri, ServletRequest request, ServletResponse response);
 }
