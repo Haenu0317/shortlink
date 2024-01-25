@@ -83,6 +83,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
      */
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
+        //todo 判断gid是否为我们用户的分组gid
         String shortLinkSuffix = generateSuffix(requestParam);
         String fullShortUrl = StrBuilder.create(requestParam.getDomain())
                 .append("/")

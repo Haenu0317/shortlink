@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haenu.shortlink.common.convention.result.Result;
 import com.haenu.shortlink.common.convention.result.Results;
 import com.haenu.shortlink.remote.dto.ShortLinkRemoteService;
+import com.haenu.shortlink.remote.dto.req.RecycleBinRecoverReqDTO;
+import com.haenu.shortlink.remote.dto.req.RecycleBinRemoveReqDTO;
 import com.haenu.shortlink.remote.dto.req.RecycleBinSaveReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkPageRespDTO;
@@ -45,4 +47,24 @@ public class RecycleBinController {
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
         return recycleBinService.pageRecycleBinShortLink(requestParam);
     }
+
+    /**
+     * 恢复短链接
+     */
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/recover")
+    public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam) {
+        shortLinkRemoteService.recoverRecycleBin(requestParam);
+        return Results.success();
+    }
+
+    /**
+     * 移除短链接
+     */
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/remove")
+    public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO requestParam) {
+        shortLinkRemoteService.removeRecycleBin(requestParam);
+        return Results.success();
+    }
+
+
 }
