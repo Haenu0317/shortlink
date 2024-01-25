@@ -5,9 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haenu.shortlink.common.convention.result.Result;
-import com.haenu.shortlink.remote.dto.req.ShortLinkCreateReqDTO;
-import com.haenu.shortlink.remote.dto.req.ShortLinkPageReqDTO;
-import com.haenu.shortlink.remote.dto.req.ShortLinkUpdateReqDTO;
+import com.haenu.shortlink.remote.dto.req.*;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkPageRespDTO;
@@ -84,6 +82,31 @@ public interface ShortLinkRemoteService {
     default Result<String> getTitleByUrl(@RequestParam("url") String url) {
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/title?url=" + url);
         return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 保存回收站
+     *
+     * @param requestParam 请求参数
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/save", JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * 分页查询回收站短链接
+     *
+     * @param requestParam 分页短链接请求参数
+     * @return 查询短链接响应
+     */
+    default Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("gidList", requestParam.getGidList());
+        requestMap.put("current", requestParam.getCurrent());
+        requestMap.put("size", requestParam.getSize());
+        String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/page", requestMap);
+        return JSON.parseObject(resultPageStr, new TypeReference<>() {
         });
     }
 }
