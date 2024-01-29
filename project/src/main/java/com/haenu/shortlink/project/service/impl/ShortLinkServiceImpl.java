@@ -91,6 +91,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
 
+    private final LinkNetworkStatsMapper linkNetworkStatsMapper;
+
+
 
 
     @Value("${short-link.stats.locale.amap-key}")
@@ -425,7 +428,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .fullShortUrl(fullShortUrl)
                         .date(date)
                         .build();
-                linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);1
+                linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);
+
+                //网络监控
+                LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
+                        .network(LinkUtil.getNetwork(((HttpServletRequest) request)))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
             }
 
         } catch (Throwable ex) {
