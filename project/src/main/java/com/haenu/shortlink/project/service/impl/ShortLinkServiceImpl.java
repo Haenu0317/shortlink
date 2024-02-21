@@ -161,12 +161,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
      */
     @Override
     public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam) {
-        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                .eq(ShortLinkDO::getGid, requestParam.getGid())
-                .eq(ShortLinkDO::getEnableStatus, 0)
-                .orderByDesc(ShortLinkDO::getCreateTime);
-        IPage<ShortLinkDO> resultPage = page(requestParam, queryWrapper);
-
+        IPage<ShortLinkDO> resultPage = baseMapper.pageLink(requestParam);
         return resultPage.convert(each -> {
             ShortLinkPageRespDTO result = BeanUtil.toBean(each, ShortLinkPageRespDTO.class);
             result.setFullShortUrl("http://" + result.getFullShortUrl());
@@ -431,7 +426,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .cnt(1)
                         .gid(gid)
                         .fullShortUrl(fullShortUrl)
-                        .date(new Date())
+                        .date(date)
                         .build();
                 linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
 
@@ -457,7 +452,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .todayUip(uipFirstFlag ? 1 : 0)
                         .gid(gid)
                         .fullShortUrl(fullShortUrl)
-                        .date(new Date())
+                        .date(date)
                         .build();
                 linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
             }
