@@ -4,12 +4,20 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haenu.shortlink.common.convention.result.Result;
 import com.haenu.shortlink.common.convention.result.Results;
 import com.haenu.shortlink.remote.dto.ShortLinkRemoteService;
+import com.haenu.shortlink.remote.dto.req.ShortLinkBatchCreateReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkPageReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkUpdateReqDTO;
+import com.haenu.shortlink.remote.dto.resp.ShortLinkBaseInfoRespDTO;
+import com.haenu.shortlink.remote.dto.resp.ShortLinkBatchCreateRespDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.haenu.shortlink.remote.dto.resp.ShortLinkPageRespDTO;
+import com.haenu.shortlink.toolkit.EasyExcelWebUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author haenu
@@ -31,6 +39,19 @@ public class ShortLinkController {
     @PostMapping("/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
          return shortLinkRemoteService.createShortLink(requestParam);
+    }
+
+    /**
+     * 批量创建短链接
+     */
+    @SneakyThrows
+    @PostMapping("/api/short-link/admin/v1/create/batch")
+    public void batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam, HttpServletResponse response) {
+        Result<ShortLinkBatchCreateRespDTO> shortLinkBatchCreateRespDTOResult = shortLinkRemoteService.batchCreateShortLink(requestParam);
+        if (shortLinkBatchCreateRespDTOResult.isSuccess()) {
+            List<ShortLinkBaseInfoRespDTO> baseLinkInfos = shortLinkBatchCreateRespDTOResult.getData().getBaseLinkInfos();
+            EasyExcelWebUtil.write(response, "批量创建短链接-SaaS短链接系统", ShortLinkBaseInfoRespDTO.class, baseLinkInfos);
+        }
     }
 
     /**
