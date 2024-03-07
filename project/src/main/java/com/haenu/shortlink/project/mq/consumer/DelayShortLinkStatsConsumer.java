@@ -1,6 +1,5 @@
 package com.haenu.shortlink.project.mq.consumer;
 
-
 import com.haenu.shortlink.project.common.convention.exception.ServiceException;
 import com.haenu.shortlink.project.dto.biz.ShortLinkStatsRecordDTO;
 import com.haenu.shortlink.project.mq.idempotent.MessageQueueIdempotentHandler;
@@ -30,7 +29,6 @@ public class DelayShortLinkStatsConsumer implements InitializingBean {
     private final RedissonClient redissonClient;
     private final ShortLinkService shortLinkService;
     private final MessageQueueIdempotentHandler messageQueueIdempotentHandler;
-
 
     public void onMessage() {
         Executors.newSingleThreadExecutor(
