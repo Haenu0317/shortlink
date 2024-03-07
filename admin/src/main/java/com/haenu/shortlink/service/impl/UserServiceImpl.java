@@ -33,7 +33,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.haenu.shortlink.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
-import static com.haenu.shortlink.common.constant.RedisCacheConstant.TOKEN_PREFIX;
+import static com.haenu.shortlink.common.constant.RedisCacheConstant.USER_LOGIN_KEY;
 import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.USER_NAME_EXIST;
 import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.USER_SAVE_ERROR;
 
@@ -147,7 +147,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
             throw new ServiceException(UserErrorCodeEnum.USER_NULL);
         }
 
-        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("login_" + userLoginReqDTO.getUsername());
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + userLoginReqDTO.getUsername());
         if (CollUtil.isNotEmpty(hasLoginMap)) {
             String token = hasLoginMap.keySet().stream()
                     .findFirst()
@@ -156,8 +156,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
             return new UserLoginRespDTO(token);
         }
         String uuid = UUID.randomUUID().toString();
-        stringRedisTemplate.opsForHash().put(TOKEN_PREFIX + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(user));
-        stringRedisTemplate.expire(TOKEN_PREFIX + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForHash().put(USER_LOGIN_KEY + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(user));
+        stringRedisTemplate.expire(USER_LOGIN_KEY + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
         return new UserLoginRespDTO(uuid);
     }
 
@@ -169,7 +169,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
      */
     @Override
     public Boolean checkLogin(String username, String token) {
-        return stringRedisTemplate.opsForHash().get(TOKEN_PREFIX + username, token) != null;
+        return stringRedisTemplate.opsForHash().get(USER_LOGIN_KEY + username, token) != null;
     }
 
     /**
@@ -182,7 +182,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     @Override
     public void logout(String username, String token) {
         if (checkLogin(username, token)) {
-            stringRedisTemplate.delete(TOKEN_PREFIX + username);
+            stringRedisTemplate.delete(USER_LOGIN_KEY + username);
             return;
         }
         throw new ClientException("Token不存在或用户未登录");
