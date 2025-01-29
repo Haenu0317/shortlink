@@ -70,8 +70,6 @@ import static com.haenu.shortlink.project.common.constant.ShortLinkConstant.AMAP
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO>
         implements ShortLinkService {
 
-    private final ShortLinkMapper shortLinkMapper;
-
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
 
     private final ShortLinkGotoMapper shortLinkGotoMapper;
@@ -85,6 +83,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
 
     private final LinkOsStatsMapper linkOsStatsMapper;
+
+    private final LinkBrowserStatsMapper linkBrowserStatsMapper;
 
 
     @Value("${short-link.stats.locale.amap-key}")
@@ -375,6 +375,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(date)
                         .build();
                 linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
+
                 //os监控
                 LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
                         .os(LinkUtil.getOs(((HttpServletRequest) request)))
@@ -384,6 +385,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
+
+                //游览器监控
+                LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
+                        .browser(LinkUtil.getBrowser(((HttpServletRequest) request)))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
             }
 
         } catch (Throwable ex) {
