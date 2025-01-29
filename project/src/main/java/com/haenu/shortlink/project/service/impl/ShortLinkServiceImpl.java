@@ -19,14 +19,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haenu.shortlink.project.common.convention.exception.ClientException;
 import com.haenu.shortlink.project.common.convention.exception.ServiceException;
 import com.haenu.shortlink.project.common.enums.VailDateTypeEnum;
-import com.haenu.shortlink.project.dao.entity.LinkAccessStatsDO;
-import com.haenu.shortlink.project.dao.entity.LinkLocaleStatsDO;
-import com.haenu.shortlink.project.dao.entity.ShortLinkDO;
-import com.haenu.shortlink.project.dao.entity.ShortLinkGotoDO;
-import com.haenu.shortlink.project.dao.mapper.LinkAccessStatsMapper;
-import com.haenu.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
-import com.haenu.shortlink.project.dao.mapper.ShortLinkGotoMapper;
-import com.haenu.shortlink.project.dao.mapper.ShortLinkMapper;
+import com.haenu.shortlink.project.dao.entity.*;
+import com.haenu.shortlink.project.dao.mapper.*;
 import com.haenu.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -89,6 +83,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessStatsMapper linkAccessStatsMapper;
 
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+
+    private final LinkOsStatsMapper linkOsStatsMapper;
+
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -378,6 +375,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(date)
                         .build();
                 linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
+                //os监控
+                LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
+                        .os(LinkUtil.getOs(((HttpServletRequest) request)))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
             }
 
         } catch (Throwable ex) {
