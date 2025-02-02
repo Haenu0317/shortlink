@@ -24,7 +24,7 @@ public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
 
 
     /**
-     * 根据短链接获取指定日期内基础监控数据
+     * 根据短链接获取指定日期内地区监控数据
      */
     @Select("SELECT " +
             "    province, " +
