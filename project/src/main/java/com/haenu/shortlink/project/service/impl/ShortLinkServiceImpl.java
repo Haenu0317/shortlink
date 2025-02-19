@@ -93,12 +93,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
 
-
-
+    private final LinkStatsTodayMapper linkStatsTodayMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
-
 
     /**
      * 创建短链接
@@ -415,8 +413,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .build();
                 linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
 
-
-
                 //用户设备
                 String device = LinkUtil.getDevice(((HttpServletRequest) request));
                 LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
@@ -452,8 +448,18 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .fullShortUrl(fullShortUrl)
                         .build();
                 linkAccessLogsMapper.insert(linkAccessLogsDO);
-                //访问统计自增加
+                //汇总访问统计自增加
                 baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0, uipFirstFlag ? 1 : 0);
+                //今日统计
+                LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
+                        .todayPv(1)
+                        .todayUv(uvFirstFlag.get() ? 1 : 0)
+                        .todayUip(uipFirstFlag ? 1 : 0)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
             }
 
         } catch (Throwable ex) {
