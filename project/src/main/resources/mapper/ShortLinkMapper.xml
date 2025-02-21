@@ -4,29 +4,41 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haenu.shortlink.project.dao.mapper.ShortLinkMapper">
 
-    <resultMap id="BaseResultMap" type="com.haenu.shortlink.project.dao.entity.ShortLinkDO">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="domain" column="domain" jdbcType="VARCHAR"/>
-            <result property="shortUri" column="short_uri" jdbcType="VARCHAR"/>
-            <result property="fullShortUrl" column="full_short_url" jdbcType="VARCHAR"/>
-            <result property="originUrl" column="origin_url" jdbcType="VARCHAR"/>
-            <result property="clickNum" column="click_num" jdbcType="INTEGER"/>
-            <result property="gid" column="gid" jdbcType="VARCHAR"/>
-            <result property="enableStatus" column="enable_status" jdbcType="TINYINT"/>
-            <result property="createdType" column="created_type" jdbcType="TINYINT"/>
-            <result property="validDateType" column="valid_date_type" jdbcType="TINYINT"/>
-            <result property="validDate" column="valid_date" jdbcType="TIMESTAMP"/>
-            <result property="describe" column="describe" jdbcType="VARCHAR"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
-    </resultMap>
-
-    <sql id="Base_Column_List">
-        id,domain,short_uri,
-        full_short_url,origin_url,click_num,
-        gid,enable_status,created_type,
-        valid_date_type,valid_date,describe,
-        create_time,update_time,del_flag
-    </sql>
+    <select id="pageLink" resultType="com.haenu.shortlink.project.dao.entity.ShortLinkDO"
+            parameterType="com.haenu.shortlink.project.dto.req.ShortLinkPageReqDTO">
+        SELECT t.*,
+        COALESCE(s.today_pv, 0) AS todayPv,
+        COALESCE(s.today_uv, 0) AS todayUv,
+        COALESCE(s.today_uip, 0) AS todayUip
+        FROM t_link t
+        LEFT JOIN t_link_stats_today s ON t.gid = s.gid
+        AND t.full_short_url = s.full_short_url
+        AND s.date = CURDATE()
+        WHERE t.gid = #{gid}
+        AND t.enable_status = 0
+        AND t.del_flag = 0
+        <choose>
+            <when test="orderTag == 'todayPv'">
+                ORDER BY todayPv DESC
+            </when>
+            <when test="orderTag == 'todayUv'">
+                ORDER BY todayUv DESC
+            </when>
+            <when test="orderTag == 'todayUip'">
+                ORDER BY todayUip DESC
+            </when>
+            <when test="orderTag == 'totalPv'">
+                ORDER BY t.total_pv DESC
+            </when>
+            <when test="orderTag == 'totalUv'">
+                ORDER BY t.total_uv DESC
+            </when>
+            <when test="orderTag == 'totalUip'">
+                ORDER BY t.total_uip DESC
+            </when>
+            <otherwise>
+                ORDER BY t.create_time DESC
+            </otherwise>
+        </choose>
+    </select>
 </mapper>
