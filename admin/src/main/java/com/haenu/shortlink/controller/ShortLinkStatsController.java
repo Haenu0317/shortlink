@@ -3,6 +3,7 @@ package com.haenu.shortlink.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haenu.shortlink.common.convention.result.Result;
 import com.haenu.shortlink.remote.dto.ShortLinkRemoteService;
+import com.haenu.shortlink.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkGroupStatsReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import com.haenu.shortlink.remote.dto.req.ShortLinkStatsReqDTO;
@@ -47,5 +48,14 @@ public class ShortLinkStatsController {
     @GetMapping("/api/short-link/admin/v1/stats/group")
     public Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
         return shortLinkRemoteService.groupShortLinkStats(requestParam);
+    }
+
+
+    /**
+     * 访问分组短链接指定时间内访问记录监控数据
+     */
+    @GetMapping("/api/short-link/admin/v1/stats/access-record/group")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return shortLinkRemoteService.groupShortLinkStatsAccessRecord(requestParam);
     }
 }
