@@ -21,12 +21,11 @@ import com.haenu.shortlink.project.common.convention.exception.ServiceException;
 import com.haenu.shortlink.project.common.enums.VailDateTypeEnum;
 import com.haenu.shortlink.project.dao.entity.*;
 import com.haenu.shortlink.project.dao.mapper.*;
+import com.haenu.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
-import com.haenu.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
-import com.haenu.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import com.haenu.shortlink.project.dto.resp.ShortLinkPageRespDTO;
+import com.haenu.shortlink.project.dto.resp.*;
 import com.haenu.shortlink.project.service.ShortLinkService;
 import com.haenu.shortlink.project.toolkit.HashUtil;
 import com.haenu.shortlink.project.toolkit.LinkUtil;
@@ -98,6 +97,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
 
+    @Value("${short-link.domain.default}")
+    private String createShortLinkDefaultDomain;
+
     /**
      * 创建短链接
      *
@@ -108,12 +110,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
         //todo 判断gid是否为我们用户的分组gid
         String shortLinkSuffix = generateSuffix(requestParam);
-        String fullShortUrl = StrBuilder.create(requestParam.getDomain())
+        String fullShortUrl = StrBuilder.create(createShortLinkDefaultDomain)
                 .append("/")
                 .append(shortLinkSuffix)
                 .toString();
         ShortLinkDO shortLinkDO = ShortLinkDO.builder()
-                .domain(requestParam.getDomain())
+                .domain(createShortLinkDefaultDomain)
                 .originUrl(requestParam.getOriginUrl())
                 .gid(requestParam.getGid())
                 .createdType(requestParam.getCreatedType())
@@ -154,6 +156,39 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     /**
+     * 批量创建短链接
+     *
+     * @param requestParam 批量创建短链接请求参数
+     * @return 批量创建短链接返回参数
+     */
+    @Override
+    public ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
+        List<String> originUrls = requestParam.getOriginUrls();
+        List<String> describes = requestParam.getDescribes();
+        List<ShortLinkBaseInfoRespDTO> result = new ArrayList<>();
+        for (int i = 0; i < originUrls.size(); i++) {
+            ShortLinkCreateReqDTO shortLinkCreateReqDTO = BeanUtil.toBean(requestParam, ShortLinkCreateReqDTO.class);
+            shortLinkCreateReqDTO.setOriginUrl(originUrls.get(i));
+            shortLinkCreateReqDTO.setDescribe(describes.get(i));
+            try {
+                ShortLinkCreateRespDTO shortLink = createShortLink(shortLinkCreateReqDTO);
+                ShortLinkBaseInfoRespDTO linkBaseInfoRespDTO = ShortLinkBaseInfoRespDTO.builder()
+                        .fullShortUrl(shortLink.getFullShortUrl())
+                        .originUrl(shortLink.getOriginUrl())
+                        .describe(describes.get(i))
+                        .build();
+                result.add(linkBaseInfoRespDTO);
+            } catch (Throwable ex) {
+                log.error("批量创建短链接失败，原始参数：{}", originUrls.get(i));
+            }
+        }
+        return ShortLinkBatchCreateRespDTO.builder()
+                .total(result.size())
+                .baseLinkInfos(result)
+                .build();
+    }
+
+    /**
      * 分页查询短链接
      *
      * @param requestParam
@@ -164,7 +199,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         IPage<ShortLinkDO> resultPage = baseMapper.pageLink(requestParam);
         return resultPage.convert(each -> {
             ShortLinkPageRespDTO result = BeanUtil.toBean(each, ShortLinkPageRespDTO.class);
-            result.setFullShortUrl("http://" + result.getFullShortUrl());
+            result.setDomain("http://" + result.getDomain());
             return result;
         });
     }
@@ -245,7 +280,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Override
     public void restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
         String serverName = request.getServerName();
-        String fullShortUrl = serverName + "/" + shortUri;
+        String serverPort = Optional.of(request.getServerPort())
+                .filter(each -> !Objects.equals(each, 80))
+                .map(String::valueOf)
+                .map(each -> ":" + each)
+                .orElse("");
+        String fullShortUrl = serverName + serverPort + "/" + shortUri;
         String originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalLink)) {
             shortLinkStats(fullShortUrl, null, request, response);

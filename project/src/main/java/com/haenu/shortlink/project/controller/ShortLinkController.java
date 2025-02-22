@@ -3,9 +3,11 @@ package com.haenu.shortlink.project.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haenu.shortlink.project.common.convention.result.Result;
 import com.haenu.shortlink.project.common.convention.result.Results;
+import com.haenu.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.haenu.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import com.haenu.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.haenu.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -38,6 +40,13 @@ public class ShortLinkController {
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
         return Results.success(shortLinkService.createShortLink(requestParam));
     }
+    /**
+     * 批量创建短链接
+     */
+    @PostMapping("/api/short-link/v1/create/batch")
+    public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
+        return Results.success(shortLinkService.batchCreateShortLink(requestParam));
+    }
 
     /**
      * 修改短链接
@@ -47,6 +56,8 @@ public class ShortLinkController {
         shortLinkService.updateShortLink(requestParam);
         return Results.success();
     }
+
+
 
     /**
      * 分页查询短链接
