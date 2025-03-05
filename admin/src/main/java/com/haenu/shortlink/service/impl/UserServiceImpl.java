@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haenu.shortlink.common.biz.user.UserContext;
 import com.haenu.shortlink.common.convention.exception.ClientException;
+import com.haenu.shortlink.common.convention.exception.ServiceException;
 import com.haenu.shortlink.common.enums.UserErrorCodeEnum;
 import com.haenu.shortlink.dao.entity.UserDO;
 import com.haenu.shortlink.dao.mapper.UserMapper;
@@ -33,7 +34,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.haenu.shortlink.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
 import static com.haenu.shortlink.common.constant.RedisCacheConstant.TOKEN_PREFIX;
-import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.*;
+import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.USER_NAME_EXIST;
+import static com.haenu.shortlink.common.enums.UserErrorCodeEnum.USER_SAVE_ERROR;
 
 /**
  * @author Haenu0317
@@ -142,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
                 .eq(UserDO::getDelFlag, 0);
         UserDO user = baseMapper.selectOne(queryWrapper);
         if (user == null) {
-            throw new ClientException(USER_NULL);
+            throw new ServiceException(UserErrorCodeEnum.USER_NULL);
         }
 
         Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("login_" + userLoginReqDTO.getUsername());
