@@ -34,7 +34,6 @@ import static com.haenu.shortlink.project.common.constant.ShortLinkConstant.AMAP
 
 /**
  * 短链接监控状态保存消息队列消费者
- * 公众号：马丁玩编程，回复：加群，添加马哥微信（备注：link）获取项目资料
  */
 @Slf4j
 @Component
@@ -55,7 +54,6 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
     private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
     private final StringRedisTemplate stringRedisTemplate;
     private final MessageQueueIdempotentHandler messageQueueIdempotentHandler;
-
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
